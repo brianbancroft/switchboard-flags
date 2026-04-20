@@ -25,7 +25,12 @@ export class SwitchboardMcpError extends Error {
 
 export class SwitchboardBackend {
   private readonly client = createClient(env.SWITCHBOARD_API_BASE_URL, {
-    defaultHeaders: env.SWITCHBOARD_API_DEFAULT_HEADERS,
+    defaultHeaders: {
+      ...env.SWITCHBOARD_API_DEFAULT_HEADERS,
+      ...(env.SWITCHBOARD_API_TOKEN
+        ? { Authorization: `Bearer ${env.SWITCHBOARD_API_TOKEN}` }
+        : {}),
+    },
   });
 
   private getAuth(): SwitchboardManagementAuth | undefined {

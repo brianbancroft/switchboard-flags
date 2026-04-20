@@ -1,12 +1,17 @@
 {
-  "name": "mcp",
-  "private": true,
+  "name": "@switchboard-flags/mcp",
   "type": "module",
   "version": "0.1.0",
+  "bin": "dist/cli.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "tsx watch src/http.ts",
     "dev:stdio": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "start": "node dist/http.js",
     "start:stdio": "node dist/index.js",
     "lint": "biome check .",
@@ -23,6 +28,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.3",
+    "tsup": "^8.5.1",
     "tsx": "^4.0.0",
     "typescript": "^5.9.2"
   }

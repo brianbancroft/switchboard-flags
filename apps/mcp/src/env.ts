@@ -2,16 +2,21 @@ import { fileURLToPath } from "node:url";
 import { config as loadEnv } from "dotenv";
 import { z } from "zod";
 
-loadEnv({
-  path: fileURLToPath(new URL("../../../.env", import.meta.url)),
-  quiet: true,
-});
-
-loadEnv({
-  path: fileURLToPath(new URL("../.env", import.meta.url)),
-  override: true,
-  quiet: true,
-});
+if (process.env.NODE_ENV !== "production") {
+  try {
+    loadEnv({
+      path: fileURLToPath(new URL("../../../.env", import.meta.url)),
+      quiet: true,
+    });
+    loadEnv({
+      path: fileURLToPath(new URL("../.env", import.meta.url)),
+      override: true,
+      quiet: true,
+    });
+  } catch {
+    // dotenv path resolution may fail when running outside the monorepo
+  }
+}
 
 function parseJsonRecord(
   raw: string | undefined,
@@ -45,6 +50,7 @@ const envSchema = z.object({
   MCP_HTTP_PATH: z.string().default("/mcp"),
   MCP_ALLOWED_HOSTS: z.string().optional(),
   MCP_AUTH_TOKEN: z.string().min(16).optional(),
+  SWITCHBOARD_API_TOKEN: z.string().optional(),
 });
 
 const rawEnv = Object.fromEntries(
