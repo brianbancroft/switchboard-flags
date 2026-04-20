@@ -1,17 +1,21 @@
 {
   "name": "@switchboard-flags/client",
-  "private": true,
   "type": "module",
   "version": "0.1.0",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
+  "files": ["dist"],
   "scripts": {
+    "build": "tsc",
     "lint": "biome check .",
     "check-types": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
