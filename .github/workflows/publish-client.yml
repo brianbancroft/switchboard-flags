@@ -1,9 +1,8 @@
 name: Publish @switchboard-flags/client
 
 on:
-  push:
-    tags:
-      - "client-v*"
+  release:
+    types: [published]
 
 jobs:
   publish:
