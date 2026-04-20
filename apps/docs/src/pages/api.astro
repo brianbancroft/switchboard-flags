@@ -1,0 +1,148 @@
+---
+const apiSpecUrl =
+  import.meta.env.PUBLIC_API_SPEC_URL ?? "http://localhost:4000/openapi.json";
+const _apiDocsUrl = apiSpecUrl.replace(/\/openapi\.json$/, "/docs");
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Switchboard API Docs</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(16, 185, 129, 0.14), transparent 22%),
+          linear-gradient(180deg, #f4fbf8 0%, #ffffff 48%);
+        color: #052e16;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        min-height: 100vh;
+      }
+
+      .hero {
+        display: grid;
+        gap: 1.5rem;
+        padding: 2.5rem 1.5rem 1.5rem;
+      }
+
+      .hero-copy {
+        max-width: 44rem;
+      }
+
+      .hero-art {
+        margin: 0;
+        border-radius: 1.75rem;
+        border: 1px solid rgba(5, 46, 22, 0.12);
+        background:
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 48%),
+          linear-gradient(180deg, #f7f2ea, #ebe4db);
+        box-shadow: 0 24px 80px rgba(4, 120, 87, 0.12);
+        overflow: hidden;
+        aspect-ratio: 1.38;
+      }
+
+      .hero-art img {
+        display: block;
+        width: 122%;
+        max-width: none;
+        height: 122%;
+        object-fit: cover;
+        object-position: center 42%;
+        transform: translate(-8.5%, -3.5%);
+      }
+
+      .eyebrow {
+        margin: 0 0 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #047857;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.25rem, 5vw, 3.5rem);
+        line-height: 1;
+      }
+
+      p {
+        max-width: 44rem;
+        margin: 0.85rem 0 0;
+        color: #166534;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      .links a {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        background: #052e16;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      redoc {
+        display: block;
+        padding: 0 1rem 2rem;
+      }
+
+      @media (min-width: 960px) {
+        .hero {
+          grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Reference</p>
+          <h1>Switchboard API Docs</h1>
+          <p>
+            This docs surface renders Redoc directly from the live OpenAPI spec
+            exposed by the Hono API service.
+          </p>
+          <div class="links">
+            <a href={apiSpecUrl} target="_blank" rel="noreferrer">Open raw spec</a>
+            <a href={_apiDocsUrl} target="_blank" rel="noreferrer">
+              Open API-hosted docs
+            </a>
+          </div>
+        </div>
+        <figure class="hero-art">
+          <img
+            src="/switchboard-image.png"
+            alt="Switchboard flagship illustration."
+          />
+        </figure>
+      </section>
+      <redoc spec-url={apiSpecUrl}></redoc>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+  </body>
+</html>

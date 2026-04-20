@@ -1,0 +1,84 @@
+---
+title: API Overview
+description: The REST surface for environments, clients, flags, overrides, API keys, and evaluation.
+---
+
+## Base URLs
+
+- Local API: `http://127.0.0.1:3003`
+- Health: `/health`
+- Database health: `/db/health`
+- OpenAPI snapshot in docs: `/openapi.yaml`
+
+## Resource Model
+
+- `environments`: top-level deployment spaces such as `production`, `staging`, or `dev`
+- `clients`: allowed callers inside an environment, identified by label and URL regex
+- `feature_flags`: named flags with typed values, default values, and targeting rules
+- `flag_overrides`: per-user overrides for support and debugging
+- `api_keys`: environment-scoped SDK credentials
+- `evaluate`: runtime endpoint for SDK evaluation
+
+## Route Groups
+
+| Group | Purpose |
+| --- | --- |
+| `GET /health` | API liveness |
+| `GET /db/health` | Database connectivity through the API boundary |
+| `/api/v1/environments` | Environment CRUD |
+| `/api/v1/environments/{environmentId}/clients` | Client registration and matching |
+| `/api/v1/environments/{environmentId}/flags` | Feature flag CRUD |
+| `/api/v1/environments/{environmentId}/overrides` | Per-user flag overrides |
+| `/api/v1/environments/{environmentId}/api-keys` | SDK API key management |
+| `/api/v1/environments/{environmentId}/evaluate` | Runtime flag evaluation |
+
+## Response Envelope
+
+Successful responses use:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "meta": {
+    "requestId": "b3f8c7f6-4f55-4c89-b4bb-61db4cbf9cd4"
+  }
+}
+```
+
+Errors use:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "This action requires write access to the environment"
+  },
+  "meta": {
+    "requestId": "b3f8c7f6-4f55-4c89-b4bb-61db4cbf9cd4"
+  }
+}
+```
+
+## Type System
+
+Flag configuration supports four value types:
+
+- `boolean`
+- `string`
+- `number`
+- `json`
+
+Targeting rules are boolean gates over request attributes. For non-boolean flags, a matched rule is reported in evaluation metadata while the configured `defaultValue` remains the returned value unless a user override exists.
+
+## Naming Rules
+
+- Environment names are free-form strings.
+- Flag names must match `^[a-z]+(?:_[a-z]+)*$`.
+- Client labels should be human-readable and stable.
+
+## Next Pages
+
+- [API Authentication](/api/authentication/)
+- [API Reference](/api/reference/)

@@ -1,0 +1,1328 @@
+openapi: 3.1.0
+info:
+  title: Switchboard API
+  version: 0.1.0
+  summary: Feature flag management API for Switchboard
+  description: >
+    OpenAPI 3.1 reference for the self-hosted Switchboard platform. This spec
+    covers management endpoints for environments, clients, feature flags,
+    overrides, and API keys, plus the runtime evaluate endpoint used by SDK
+    callers.
+servers:
+  - url: http://127.0.0.1:3003
+    description: Local development
+tags:
+  - name: System
+  - name: Environments
+  - name: Clients
+  - name: Feature Flags
+  - name: Overrides
+  - name: API Keys
+  - name: Evaluation
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Management authentication for UI and admin callers. The current runtime
+        implementation resolves a Better Auth session or forwarded UI user
+        identity, while the public API contract models these endpoints as bearer
+        authenticated.
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Environment-scoped SDK API key.
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Development-only authentication for evaluate on dev environments.
+  parameters:
+    EnvironmentId:
+      name: environmentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ClientId:
+      name: clientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    FlagId:
+      name: flagId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OverrideId:
+      name: overrideId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ApiKeyId:
+      name: apiKeyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    JsonValue:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: object
+          additionalProperties: true
+        - type: array
+          items: {}
+        - type: "null"
+    Meta:
+      type: object
+      required: [requestId]
+      properties:
+        requestId:
+          type: string
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details: {}
+    ErrorResponse:
+      type: object
+      required: [success, error, meta]
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          $ref: "#/components/schemas/Error"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    EnvironmentType:
+      type: string
+      enum: [production, staging, nightly, dev]
+    EnvironmentMemberRole:
+      type: string
+      enum: [admin, write, read]
+    ApiKeyScope:
+      type: string
+      enum:
+        - environment:read
+        - environment:write
+        - environment:admin
+        - flags:read
+        - flags:write
+        - flags:override
+        - apiKeys:read
+        - apiKeys:write
+    FlagValueType:
+      type: string
+      enum: [boolean, string, number, json]
+    FeatureFlagRule:
+      type: object
+      required: [attribute, operator, value]
+      properties:
+        attribute:
+          type: string
+          minLength: 1
+          maxLength: 120
+        operator:
+          type: string
+          enum: [eq, ne, in, not_in, lt, lte, gt, gte, contains, starts_with, ends_with]
+        value:
+          $ref: "#/components/schemas/JsonValue"
+    FeatureFlagConfig:
+      type: object
+      required: [type, defaultValue, rules]
+      properties:
+        type:
+          $ref: "#/components/schemas/FlagValueType"
+        defaultValue:
+          $ref: "#/components/schemas/JsonValue"
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureFlagRule"
+    Environment:
+      type: object
+      required:
+        - id
+        - name
+        - ownerId
+        - type
+        - isOwner
+        - canWrite
+        - canAdmin
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, "null"]
+        ownerId:
+          type: string
+          format: uuid
+        type:
+          $ref: "#/components/schemas/EnvironmentType"
+        membershipRole:
+          oneOf:
+            - $ref: "#/components/schemas/EnvironmentMemberRole"
+            - type: "null"
+        isOwner:
+          type: boolean
+        canWrite:
+          type: boolean
+        canAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    EnvironmentClient:
+      type: object
+      required: [id, environmentId, label, urlPattern, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        environmentId:
+          type: string
+          format: uuid
+        label:
+          type: string
+        urlPattern:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    FeatureFlag:
+      type: object
+      required: [id, environmentId, name, config, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        environmentId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          pattern: "^[a-z]+(?:_[a-z]+)*$"
+        description:
+          type: [string, "null"]
+        config:
+          $ref: "#/components/schemas/FeatureFlagConfig"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    FlagOverride:
+      type: object
+      required: [id, environmentId, flagId, userId, value, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        environmentId:
+          type: string
+          format: uuid
+        flagId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        value:
+          $ref: "#/components/schemas/JsonValue"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ApiKey:
+      type: object
+      required: [id, environmentId, scopes, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        environmentId:
+          type: string
+          format: uuid
+        description:
+          type: [string, "null"]
+        scopes:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiKeyScope"
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+        lastUsedAt:
+          type: [string, "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    EvaluateFlag:
+      type: object
+      required: [id, name, type, value, source, ruleMatched, matchedRule]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/FlagValueType"
+        value:
+          $ref: "#/components/schemas/JsonValue"
+        source:
+          type: string
+          enum: [default, override, rule]
+        ruleMatched:
+          type: boolean
+        matchedRule:
+          oneOf:
+            - $ref: "#/components/schemas/FeatureFlagRule"
+            - type: "null"
+    EvaluateResponse:
+      type: object
+      required: [environmentId, evaluatedAt, clientMatched, evaluations]
+      properties:
+        environmentId:
+          type: string
+          format: uuid
+        evaluatedAt:
+          type: string
+          format: date-time
+        clientMatched:
+          type: boolean
+        evaluations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/EvaluateFlag"
+    SuccessHealth:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [status, service, environment, timestamp]
+          properties:
+            status:
+              type: string
+              const: ok
+            service:
+              type: string
+              const: switchboard-api
+            environment:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessDbHealth:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [status, database, checkedAt]
+          properties:
+            status:
+              type: string
+              const: ok
+            database:
+              type: string
+              const: connected
+            checkedAt:
+              type: string
+              format: date-time
+        meta:
+          $ref: "#/components/schemas/Meta"
+    EnvironmentCreateInput:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 500
+        type:
+          $ref: "#/components/schemas/EnvironmentType"
+    EnvironmentUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 500
+        type:
+          $ref: "#/components/schemas/EnvironmentType"
+      minProperties: 1
+    ClientInput:
+      type: object
+      required: [label, urlPattern]
+      properties:
+        label:
+          type: string
+          minLength: 1
+          maxLength: 120
+        urlPattern:
+          type: string
+          minLength: 1
+          maxLength: 500
+    ClientUpdateInput:
+      type: object
+      properties:
+        label:
+          type: string
+          minLength: 1
+          maxLength: 120
+        urlPattern:
+          type: string
+          minLength: 1
+          maxLength: 500
+      minProperties: 1
+    FeatureFlagCreateInput:
+      type: object
+      required: [name, config]
+      properties:
+        name:
+          type: string
+          pattern: "^[a-z]+(?:_[a-z]+)*$"
+        description:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 500
+        config:
+          $ref: "#/components/schemas/FeatureFlagConfig"
+    FeatureFlagUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: "^[a-z]+(?:_[a-z]+)*$"
+        description:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 500
+        config:
+          $ref: "#/components/schemas/FeatureFlagConfig"
+      minProperties: 1
+    FlagOverrideCreateInput:
+      type: object
+      required: [flagId, userId, value]
+      properties:
+        flagId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        value:
+          $ref: "#/components/schemas/JsonValue"
+    FlagOverrideUpdateInput:
+      type: object
+      required: [value]
+      properties:
+        value:
+          $ref: "#/components/schemas/JsonValue"
+    ApiKeyCreateInput:
+      type: object
+      required: [scopes]
+      properties:
+        description:
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 500
+        scopes:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ApiKeyScope"
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+    EvaluateRequest:
+      type: object
+      properties:
+        flagNames:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            type: string
+            pattern: "^[a-z]+(?:_[a-z]+)*$"
+        userId:
+          type: string
+          format: uuid
+        clientLabel:
+          type: string
+          minLength: 1
+          maxLength: 120
+        url:
+          type: string
+          format: uri
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/JsonValue"
+    SuccessEnvironmentList:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [environments]
+          properties:
+            environments:
+              type: array
+              items:
+                $ref: "#/components/schemas/Environment"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessEnvironment:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [environment]
+          properties:
+            environment:
+              $ref: "#/components/schemas/Environment"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessDelete:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [deleted]
+          properties:
+            deleted:
+              type: boolean
+              const: true
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessClientList:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [clients]
+          properties:
+            clients:
+              type: array
+              items:
+                $ref: "#/components/schemas/EnvironmentClient"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessClient:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [client]
+          properties:
+            client:
+              $ref: "#/components/schemas/EnvironmentClient"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessFlagList:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [flags]
+          properties:
+            flags:
+              type: array
+              items:
+                $ref: "#/components/schemas/FeatureFlag"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessFlag:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [flag]
+          properties:
+            flag:
+              $ref: "#/components/schemas/FeatureFlag"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessOverrideList:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [overrides]
+          properties:
+            overrides:
+              type: array
+              items:
+                $ref: "#/components/schemas/FlagOverride"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessOverride:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [override]
+          properties:
+            override:
+              $ref: "#/components/schemas/FlagOverride"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessApiKeyList:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [apiKeys]
+          properties:
+            apiKeys:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiKey"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessApiKey:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [apiKey]
+          properties:
+            apiKey:
+              $ref: "#/components/schemas/ApiKey"
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessApiKeyCreate:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [apiKey, plaintextKey]
+          properties:
+            apiKey:
+              $ref: "#/components/schemas/ApiKey"
+            plaintextKey:
+              type: string
+        meta:
+          $ref: "#/components/schemas/Meta"
+    SuccessEvaluate:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: "#/components/schemas/EvaluateResponse"
+        meta:
+          $ref: "#/components/schemas/Meta"
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Check API health
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessHealth"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /db/health:
+    get:
+      tags: [System]
+      summary: Check database connectivity
+      responses:
+        "200":
+          description: Database connection is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDbHealth"
+        "503":
+          description: Database is unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments:
+    get:
+      tags: [Environments]
+      summary: List environments visible to the authenticated UI user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Accessible environments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEnvironmentList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [Environments]
+      summary: Create a new environment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentCreateInput"
+      responses:
+        "201":
+          description: Environment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEnvironment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}:
+    get:
+      tags: [Environments]
+      summary: Get one environment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      responses:
+        "200":
+          description: Environment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEnvironment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags: [Environments]
+      summary: Update environment metadata
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentUpdateInput"
+      responses:
+        "200":
+          description: Environment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEnvironment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Environments]
+      summary: Delete an environment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      responses:
+        "200":
+          description: Environment deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDelete"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/clients:
+    get:
+      tags: [Clients]
+      summary: List environment clients
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      responses:
+        "200":
+          description: Environment clients
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessClientList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [Clients]
+      summary: Create an environment client
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "201":
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessClient"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/clients/{clientId}:
+    get:
+      tags: [Clients]
+      summary: Get an environment client
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/ClientId"
+      responses:
+        "200":
+          description: Client details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessClient"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags: [Clients]
+      summary: Update an environment client
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/ClientId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientUpdateInput"
+      responses:
+        "200":
+          description: Client updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessClient"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Clients]
+      summary: Delete an environment client
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/ClientId"
+      responses:
+        "200":
+          description: Client deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDelete"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/flags:
+    get:
+      tags: [Feature Flags]
+      summary: List feature flags in an environment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      responses:
+        "200":
+          description: Environment feature flags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessFlagList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [Feature Flags]
+      summary: Create a feature flag
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatureFlagCreateInput"
+      responses:
+        "201":
+          description: Feature flag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessFlag"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/flags/{flagId}:
+    get:
+      tags: [Feature Flags]
+      summary: Get a feature flag
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/FlagId"
+      responses:
+        "200":
+          description: Feature flag details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessFlag"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags: [Feature Flags]
+      summary: Update a feature flag
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/FlagId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatureFlagUpdateInput"
+      responses:
+        "200":
+          description: Feature flag updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessFlag"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Feature Flags]
+      summary: Delete a feature flag
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/FlagId"
+      responses:
+        "200":
+          description: Feature flag deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDelete"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/overrides:
+    get:
+      tags: [Overrides]
+      summary: List flag overrides in an environment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - name: flagId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Flag overrides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessOverrideList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [Overrides]
+      summary: Create a flag override
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlagOverrideCreateInput"
+      responses:
+        "201":
+          description: Override created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessOverride"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/overrides/{overrideId}:
+    patch:
+      tags: [Overrides]
+      summary: Update a flag override
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/OverrideId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlagOverrideUpdateInput"
+      responses:
+        "200":
+          description: Override updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessOverride"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Overrides]
+      summary: Delete a flag override
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/OverrideId"
+      responses:
+        "200":
+          description: Override deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDelete"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/api-keys:
+    get:
+      tags: [API Keys]
+      summary: List API keys for an environment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      responses:
+        "200":
+          description: Environment API keys
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessApiKeyList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [API Keys]
+      summary: Create an API key
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiKeyCreateInput"
+      responses:
+        "201":
+          description: API key created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessApiKeyCreate"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/api-keys/{apiKeyId}:
+    get:
+      tags: [API Keys]
+      summary: Get an API key record
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/ApiKeyId"
+      responses:
+        "200":
+          description: API key details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessApiKey"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [API Keys]
+      summary: Delete an API key
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+        - $ref: "#/components/parameters/ApiKeyId"
+      responses:
+        "200":
+          description: API key deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDelete"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/environments/{environmentId}/evaluate:
+    post:
+      tags: [Evaluation]
+      summary: Evaluate feature flags for an SDK caller
+      description: >
+        Rules act as boolean targeting gates. For non-boolean flags, matched
+        rules are surfaced as metadata while the configured default value is
+        returned unless a user override exists.
+      security:
+        - apiKeyAuth: []
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateRequest"
+      responses:
+        "200":
+          description: Evaluation results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEvaluate"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

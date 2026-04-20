@@ -1,0 +1,133 @@
+---
+title: Quickstart
+description: Deploy and run the full Switchboard stack locally.
+---
+
+## What You Will Run
+
+- `apps/api`: Hono.js management and evaluation API
+- `postgres`: Drizzle-backed PostgreSQL database
+- `apps/mcp`: MCP server for coding assistants
+- `apps/docs`: this documentation site
+
+## Prerequisites
+
+- Node.js `18+`
+- `pnpm` `9`
+- Docker Desktop or another Docker runtime
+
+## 1. Install Dependencies
+
+```bash
+pnpm install
+```
+
+## 2. Start PostgreSQL And Apply Migrations
+
+```bash
+pnpm up
+```
+
+That starts the local PostgreSQL container from [docker-compose.yml](/Users/brianbancroft/programming/side-hustle/switchboard/docker-compose.yml) and applies the Drizzle migrations from `apps/api/drizzle`.
+
+## 3. Create A Local Environment File
+
+Create a repo-level `.env` with at least:
+
+```bash
+DATABASE_URL=postgres://postgres@127.0.0.1:5432/switchboard
+
+API_HOST=127.0.0.1
+API_PORT=3003
+API_BASE_URL=http://127.0.0.1:3003
+
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+BETTER_AUTH_TRUSTED_ORIGINS=http://localhost:3000,http://localhost:3001
+
+DEV_BASIC_AUTH_USERNAME=dev
+DEV_BASIC_AUTH_PASSWORD=dev-password
+
+SWITCHBOARD_API_BASE_URL=http://127.0.0.1:3003
+MCP_HTTP_HOST=127.0.0.1
+MCP_HTTP_PORT=3010
+MCP_HTTP_PATH=/mcp
+MCP_AUTH_TOKEN=replace-with-a-long-random-token
+```
+
+## 4. Start The Workspace
+
+```bash
+pnpm dev
+```
+
+Useful URLs:
+
+- Product UI: `http://localhost:3000`
+- Docs: `http://localhost:3001`
+- API health: `http://127.0.0.1:3003/health`
+- Database health: `http://127.0.0.1:3003/db/health`
+- API-hosted Redoc: `http://127.0.0.1:3003/docs`
+- MCP health: `http://127.0.0.1:3010/healthz`
+
+## 5. Seed Or Create Your First Environment
+
+Switchboard management routes require a UI user context. In local development, the MCP server usually points at a specific user row via `SWITCHBOARD_API_UI_USER_ID`.
+
+Recommended flow:
+
+1. Sign in through the UI so a user exists in `users`.
+2. Copy that user UUID.
+3. Set `SWITCHBOARD_API_UI_USER_ID=<uuid>` in `.env`.
+4. Restart the MCP server.
+
+Then create your first environment from the UI or MCP.
+
+## 6. Validate The MCP Server
+
+### HTTP transport
+
+```bash
+curl \
+  -H "Authorization: Bearer $MCP_AUTH_TOKEN" \
+  http://127.0.0.1:3010/healthz
+```
+
+### stdio transport
+
+```bash
+pnpm --filter mcp dev:stdio
+```
+
+Point your assistant at [apps/mcp/examples/mcp.stdio.json](/Users/brianbancroft/programming/side-hustle/switchboard/apps/mcp/examples/mcp.stdio.json) or [apps/mcp/examples/claude_desktop_config.json](/Users/brianbancroft/programming/side-hustle/switchboard/apps/mcp/examples/claude_desktop_config.json).
+
+## 7. Verify The API Boundary
+
+Switchboard enforces one architectural rule everywhere in the repo:
+
+> Only `apps/api` may directly touch the database.
+
+That means:
+
+- UI apps call the REST API.
+- The MCP server calls the REST API.
+- Shared packages may define types, clients, and helpers, but not database access.
+
+## Common Commands
+
+```bash
+pnpm dev
+pnpm dev:api
+pnpm dev:mcp
+pnpm dev:docs
+pnpm db:generate
+pnpm db:migrate
+pnpm db:studio
+pnpm lint
+pnpm check-types
+```
+
+## Next Steps
+
+- Read [Architecture Overview](/architecture/overview/)
+- Review [API Authentication](/api/authentication/)
+- Connect an assistant using [MCP Client Setup](/mcp/client-setup/)

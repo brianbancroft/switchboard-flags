@@ -1,0 +1,86 @@
+---
+title: Authentication
+description: Auth modes for UI management, SDK evaluation, and local development.
+---
+
+## Supported Modes
+
+Switchboard uses three authentication models across the platform:
+
+| Use case | Mechanism | Typical caller |
+| --- | --- | --- |
+| Management UI and admin APIs | Bearer-style UI auth in OpenAPI, implemented today through Better Auth session middleware | Browser UI, admin tooling, MCP management context |
+| SDK and runtime evaluation | `X-API-Key` or `Authorization: Bearer <api-key>` | Backend SDKs, edge functions, services |
+| Local development for `dev` environments | HTTP Basic Auth | Local SDK tests and temporary integrations |
+
+## UI Authentication
+
+Management routes under `/api/v1/environments*` require an authenticated UI user.
+
+Current implementation details:
+
+- The runtime middleware uses Better Auth session resolution.
+- The OpenAPI document models these routes as `bearerAuth` for compatibility with external tooling.
+- The MCP server usually authenticates as a known UI user via `SWITCHBOARD_API_UI_USER_ID`, which the shared SDK maps to the `x-switchboard-user-id` header.
+
+If you are integrating a custom admin client, treat the bearer requirement in the spec as the management auth contract and map it to the session or upstream auth mechanism used in your deployment.
+
+## SDK Authentication
+
+The evaluation endpoint accepts:
+
+- `X-API-Key: sb_...`
+- `X-Switchboard-API-Key: sb_...`
+- `Authorization: Bearer sb_...`
+
+API keys are:
+
+- scoped to one environment
+- stored hashed in PostgreSQL
+- issued only once in plaintext on creation
+- validated for expiration and scope on each request
+
+Recommended scopes for runtime callers:
+
+- `flags:read`
+- `environment:read`
+
+## HTTP Basic Auth For Dev
+
+HTTP Basic Auth is only allowed when:
+
+- the target environment type is `dev`
+- `DEV_BASIC_AUTH_USERNAME` and `DEV_BASIC_AUTH_PASSWORD` are configured in the API
+
+Example:
+
+```bash
+curl \
+  -u dev:dev-password \
+  -H "Content-Type: application/json" \
+  -d '{"flagNames":["dark_mode"],"attributes":{"plan":"pro"}}' \
+  http://127.0.0.1:3003/api/v1/environments/ENV_ID/evaluate
+```
+
+## MCP Authentication
+
+The MCP server has two distinct auth surfaces:
+
+1. Upstream auth to the Switchboard API
+2. Downstream auth for assistants connecting to the MCP HTTP endpoint
+
+Recommended environment variables:
+
+```bash
+SWITCHBOARD_API_BASE_URL=http://127.0.0.1:3003
+SWITCHBOARD_API_UI_USER_ID=<real-user-uuid>
+SWITCHBOARD_EVALUATE_API_KEYS_JSON={"<environment-id>":"sb_..."}
+MCP_AUTH_TOKEN=<long-random-token>
+```
+
+## Security Notes
+
+- Prefer environment-scoped API keys over shared credentials.
+- Reserve Basic Auth for local development.
+- Rotate `MCP_AUTH_TOKEN` and environment API keys regularly.
+- Do not expose the MCP HTTP transport publicly without bearer protection or equivalent upstream auth.

@@ -1,0 +1,20 @@
+---
+title: System Overview
+description: High-level layout of the Switchboard monorepo.
+---
+
+## Apps
+
+- `apps/api` exposes backend behavior and is the system boundary for database access
+- `apps/ui` holds the main React Router experience for the product surface
+- `apps/docs` is the Astro docs site
+
+## Shared packages
+
+- `packages/api-sdk` is the client-facing interface for talking to the API
+- `packages/ui` holds reusable UI primitives
+- `packages/eslint-config` and `packages/typescript-config` keep the workspace aligned
+
+## Guiding rule
+
+Only the API should directly touch the database. Other apps should integrate through API contracts instead of reaching into persistence concerns.

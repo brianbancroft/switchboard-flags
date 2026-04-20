@@ -1,0 +1,69 @@
+---
+title: Security And Permissions
+description: Permission boundaries across the API, SDK, MCP server, and database.
+---
+
+## Security Model
+
+Switchboard separates responsibilities across three layers:
+
+| Layer | Responsibility |
+| --- | --- |
+| API | Authentication, authorization, validation, persistence |
+| SDK and UI clients | Authenticated HTTP callers only |
+| MCP server | Safe assistant-facing control plane over the API |
+
+## Environment Permissions
+
+Environment members have one of:
+
+- `read`
+- `write`
+- `admin`
+
+Owners and mega-admins bypass normal role restrictions.
+
+## API Key Scopes
+
+SDK keys can include:
+
+- `environment:read`
+- `environment:write`
+- `environment:admin`
+- `flags:read`
+- `flags:write`
+- `flags:override`
+- `apiKeys:read`
+- `apiKeys:write`
+
+Evaluation accepts any scope set that includes one of:
+
+- `flags:read`
+- `flags:write`
+- `environment:read`
+- `environment:write`
+- `environment:admin`
+
+## Database Safety
+
+Only `apps/api` may access PostgreSQL directly. This prevents:
+
+- UI privilege bypass
+- MCP overreach
+- inconsistent validation behavior
+- schema coupling across apps
+
+## MCP Safety
+
+- write tools require explicit approval
+- HTTP transport can require `MCP_AUTH_TOKEN`
+- resources are read-only snapshots
+- evaluation credentials can be environment-scoped
+
+## Deployment Recommendations
+
+- keep API and MCP on private networking when possible
+- terminate TLS at a trusted edge or reverse proxy
+- rotate secrets regularly
+- never log plaintext API keys after creation
+- use separate environments and keys for staging and production

@@ -1,0 +1,38 @@
+{
+  "name": "switchboard",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "db:drop": "pnpm --filter api db:drop",
+    "db:generate": "pnpm --filter api db:generate",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:studio": "pnpm --filter api db:studio",
+    "db:seed": "pnpm --filter api db:seed",
+    "up": "docker compose up -d --wait postgres && pnpm db:migrate && pnpm db:seed",
+    "down": "docker compose down -v --remove-orphans",
+    "dev": "turbo run dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:docs": "pnpm --filter docs dev",
+    "dev:mcp": "pnpm --filter mcp dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:dashboard": "pnpm --filter dashboard dev",
+    "test:e2e": "playwright test",
+    "test:e2e:auth": "playwright test tests/auth.spec.ts",
+    "lint": "turbo run lint",
+    "format": "biome check --write .",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@biomejs/biome": "^2.4.11",
+    "@types/pg": "^8.11.10",
+    "pg": "^8.13.1",
+    "tsx": "^4.19.2",
+    "turbo": "^2.9.6",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,55 @@
+---
+title: MCP Overview
+description: What MCP is and why Switchboard includes a dedicated MCP server.
+---
+
+## What Is MCP
+
+Model Context Protocol, or MCP, is a standard way for coding assistants and AI agents to:
+
+- discover tools
+- fetch structured resources
+- invoke safe actions
+- operate against real systems without custom one-off plugins
+
+Instead of pasting undocumented admin APIs into prompts, you expose a formal tool surface.
+
+## Why MCP Matters For Switchboard
+
+Feature flags are a strong MCP fit because assistants often need to:
+
+- inspect which flags exist
+- create safe rollout plans
+- evaluate a flag for a user or client context
+- set temporary overrides while debugging
+- create environment-scoped SDK keys with explicit human approval
+
+Switchboard’s MCP server gives assistants those abilities while preserving the architecture rule that only the API touches the database.
+
+## Design Principles
+
+- The MCP server is API-backed, not database-backed.
+- Read tools are safe by default.
+- Write tools require explicit approval in the input payload.
+- Resources provide low-friction context snapshots for agent planning.
+- Prompts guide assistants toward safer rollout behavior.
+
+## Exposed Surface
+
+Switchboard MCP currently ships:
+
+- 24 tools
+- 2 resources
+- 2 prompts
+- 2 transports: stdio and Streamable HTTP
+
+## When To Use It
+
+Use the MCP server when you want an assistant to:
+
+- manage flags from inside an IDE
+- debug rollout behavior from real environment state
+- inspect flag inventory without granting database access
+- coordinate support workflows around temporary overrides
+
+Use the raw REST API when you are building direct application integrations or server-side SDK consumers.

@@ -1,0 +1,43 @@
+---
+title: Getting Started
+description: Run the Switchboard workspace and open the Astro docs locally.
+---
+
+## Install dependencies
+
+```bash
+pnpm install
+```
+
+## Start the workspace
+
+```bash
+pnpm dev
+```
+
+## Run the API database migration
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+## Start docs only
+
+```bash
+pnpm --filter docs dev
+```
+
+The docs app runs on `http://localhost:3001`.
+
+The API runs on `http://localhost:4000`, with:
+
+- Redoc at `http://localhost:4000/docs`
+- The OpenAPI document at `http://localhost:4000/openapi.json`
+- The docs-app API reference at `http://localhost:3001/api`
+
+## Where to edit
+
+- Add or update docs pages in `apps/docs/src/content/docs`
+- Configure navigation and social links in `apps/docs/astro.config.mjs`
+- Keep product-specific guidance aligned with the rest of the monorepo

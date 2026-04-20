@@ -1,0 +1,142 @@
+---
+title: Client Setup
+description: Connect the Switchboard MCP server to common AI coding tools.
+---
+
+## Supported Transports
+
+- `stdio` for local editor integrations that spawn a child process
+- Streamable HTTP for remote or shared MCP deployments
+
+## Common Files
+
+- stdio example: [apps/mcp/examples/mcp.stdio.json](/Users/brianbancroft/programming/side-hustle/switchboard/apps/mcp/examples/mcp.stdio.json)
+- HTTP example: [apps/mcp/examples/mcp.http.json](/Users/brianbancroft/programming/side-hustle/switchboard/apps/mcp/examples/mcp.http.json)
+- Claude Desktop example: [apps/mcp/examples/claude_desktop_config.json](/Users/brianbancroft/programming/side-hustle/switchboard/apps/mcp/examples/claude_desktop_config.json)
+
+## Cursor
+
+1. Start the API and MCP server locally.
+2. Open Cursor settings.
+3. Find the MCP or tools integration section.
+4. Add a server named `switchboard`.
+5. Paste a config equivalent to:
+
+```json
+{
+  "mcpServers": {
+    "switchboard": {
+      "command": "pnpm",
+      "args": ["--filter", "mcp", "start:stdio"],
+      "cwd": "/Users/brianbancroft/programming/side-hustle/switchboard",
+      "env": {
+        "SWITCHBOARD_API_BASE_URL": "http://127.0.0.1:3003",
+        "SWITCHBOARD_API_UI_USER_ID": "PUT-REAL-USER-UUID-HERE"
+      }
+    }
+  }
+}
+```
+
+Screenshot description:
+
+- Open Cursor Settings
+- Navigate to MCP Servers
+- Click Add Server
+- Paste the JSON config
+- Confirm the server shows as connected
+
+## Claude Code Or Claude Desktop
+
+Use the Claude Desktop config shape:
+
+```json
+{
+  "mcpServers": {
+    "switchboard": {
+      "command": "pnpm",
+      "args": ["--filter", "mcp", "start:stdio"],
+      "cwd": "/Users/brianbancroft/programming/side-hustle/switchboard",
+      "env": {
+        "SWITCHBOARD_API_BASE_URL": "http://127.0.0.1:3003",
+        "SWITCHBOARD_API_UI_USER_ID": "PUT-REAL-USER-UUID-HERE"
+      }
+    }
+  }
+}
+```
+
+For remote HTTP transport:
+
+```json
+{
+  "mcpServers": {
+    "switchboard": {
+      "url": "http://127.0.0.1:3010/mcp",
+      "headers": {
+        "Authorization": "Bearer REPLACE_WITH_MCP_AUTH_TOKEN"
+      }
+    }
+  }
+}
+```
+
+## VS Code And GitHub Copilot
+
+As MCP support lands in your VS Code + Copilot workflow, use the same two configuration shapes:
+
+- stdio when the editor launches the server locally
+- HTTP when the editor connects to a remote MCP endpoint
+
+Recommended pattern:
+
+1. Keep Switchboard running locally with `pnpm dev:api` and `pnpm dev:mcp`.
+2. Configure the assistant to load the `switchboard` server.
+3. Verify by asking the assistant to list environments or check health.
+
+## OpenAI Codex
+
+Codex can connect to the same stdio or HTTP endpoint. Prefer:
+
+- stdio for local development inside the repo
+- HTTP for shared environments or remote workers
+
+Example stdio config:
+
+```json
+{
+  "mcpServers": {
+    "switchboard": {
+      "command": "pnpm",
+      "args": ["--filter", "mcp", "start:stdio"],
+      "cwd": "/Users/brianbancroft/programming/side-hustle/switchboard",
+      "env": {
+        "SWITCHBOARD_API_BASE_URL": "http://127.0.0.1:3003",
+        "SWITCHBOARD_API_UI_USER_ID": "PUT-REAL-USER-UUID-HERE",
+        "SWITCHBOARD_EVALUATE_API_KEYS_JSON": "{\"ENVIRONMENT_ID\":\"sb_...\"}"
+      }
+    }
+  }
+}
+```
+
+## Other MCP-Capable Tools
+
+Any client that understands MCP can connect if it supports either:
+
+- child-process stdio servers
+- Streamable HTTP servers with bearer headers
+
+Connection facts:
+
+- HTTP path defaults to `/mcp`
+- health endpoint is `/healthz`
+- bearer protection is optional but strongly recommended
+
+## Test The Connection
+
+Try prompts like:
+
+- `List all Switchboard environments I can access.`
+- `Show me the current feature flags in production.`
+- `Evaluate dark_mode for user 11111111-1111-1111-1111-111111111111 in production.`

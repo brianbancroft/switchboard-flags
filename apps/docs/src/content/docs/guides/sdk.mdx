@@ -1,0 +1,109 @@
+---
+title: SDK Guide
+description: Use the TypeScript SDK and adapt the patterns for other languages.
+---
+
+## TypeScript And JavaScript
+
+The canonical client lives in `packages/api-sdk`.
+
+### Management Example
+
+```ts
+import { createClient } from "@repo/api-sdk";
+
+const client = createClient("http://127.0.0.1:3003", {
+  managementAuth: {
+    kind: "ui-user-id",
+    userId: process.env.SWITCHBOARD_UI_USER_ID!,
+  },
+});
+
+const environments = await client.listEnvironments();
+console.log(environments.environments);
+```
+
+### SDK Evaluation Example
+
+```ts
+import { createClient } from "@repo/api-sdk";
+
+const client = createClient("http://127.0.0.1:3003", {
+  sdkAuth: {
+    kind: "api-key",
+    apiKey: process.env.SWITCHBOARD_API_KEY!,
+  },
+});
+
+const result = await client.evaluateEnvironment("ENVIRONMENT_ID", {
+  flagNames: ["dark_mode", "new_nav"],
+  userId: "USER_ID",
+  clientLabel: "web-app",
+  url: "https://app.example.com/dashboard",
+  attributes: {
+    plan: "pro",
+    seats: 12,
+    region: "ca",
+  },
+});
+
+console.log(result.evaluations.dark_mode?.value);
+```
+
+## SDK Request Patterns
+
+- Use management auth for environment, client, flag, override, and API key CRUD.
+- Use SDK auth for runtime evaluation.
+- Keep evaluation requests small by passing only the flags you need.
+
+## Other Languages
+
+Switchboard is HTTP-first, so the same patterns port cleanly.
+
+### Python stub
+
+```py
+import requests
+
+resp = requests.post(
+    "http://127.0.0.1:3003/api/v1/environments/ENV_ID/evaluate",
+    headers={
+        "Authorization": "Bearer sb_your_api_key",
+        "Content-Type": "application/json",
+    },
+    json={
+        "flagNames": ["dark_mode"],
+        "userId": "USER_ID",
+        "attributes": {"plan": "pro"},
+    },
+    timeout=10,
+)
+
+print(resp.json())
+```
+
+### Go stub
+
+```go
+// POST /api/v1/environments/{environmentId}/evaluate
+// Authorization: Bearer sb_your_api_key
+// Body: {"flagNames":["dark_mode"],"attributes":{"plan":"pro"}}
+```
+
+### Ruby stub
+
+```rb
+# POST /api/v1/environments/:environment_id/evaluate
+# Header: Authorization: Bearer sb_your_api_key
+```
+
+## Generated Clients
+
+Because the docs site ships a checked-in OpenAPI 3.1 spec, you can generate additional SDKs with your preferred tooling:
+
+```bash
+npx openapi-generator-cli generate \
+  -i apps/docs/public/openapi.yaml \
+  -g python \
+  -o ./generated/python
+```

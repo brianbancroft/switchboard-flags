@@ -1,0 +1,76 @@
+---
+title: Troubleshooting
+description: Common issues when running the API, database, SDK, and MCP server.
+---
+
+## API Returns `401 UNAUTHENTICATED`
+
+Likely causes:
+
+- no Better Auth session for management routes
+- missing `SWITCHBOARD_API_UI_USER_ID` in MCP local development
+- SDK caller is hitting a management endpoint instead of using UI auth
+
+## API Returns `401 INVALID_API_KEY`
+
+Check:
+
+- the key belongs to the target environment
+- the key has not expired
+- you are sending `X-API-Key` or `Authorization: Bearer sb_...`
+
+## API Returns `403 CLIENT_NOT_ALLOWED`
+
+The evaluation request included `clientLabel` or `url`, but no registered client matched.
+
+Verify:
+
+- the environment has a client with the expected label
+- the URL regex matches the actual request URL
+
+## API Returns `400 INVALID_OVERRIDE_VALUE`
+
+The override type does not match the flag type.
+
+Examples:
+
+- boolean flag cannot accept a string override
+- number flag cannot accept an object override
+
+## MCP Server Starts But Tools Fail
+
+Check:
+
+- `SWITCHBOARD_API_BASE_URL`
+- `SWITCHBOARD_API_UI_USER_ID`
+- `MCP_AUTH_TOKEN` for HTTP transport
+- that the API itself is healthy at `/health`
+
+## `/api` Reference Page Does Not Match Runtime
+
+The docs site renders from the checked-in OpenAPI snapshot. If you changed route contracts:
+
+1. update the Hono route definitions
+2. regenerate or refresh the OpenAPI snapshot
+3. rebuild the docs site
+
+## OpenAPI Runtime Route Returns `500`
+
+The current generator has trouble with the recursive arbitrary JSON schema used for flag values. The docs site uses a static snapshot so documentation remains available even when runtime generation fails.
+
+## Database Connection Errors
+
+Check:
+
+- `DATABASE_URL`
+- Docker PostgreSQL is running
+- migrations were applied with `pnpm db:migrate`
+
+## Cursor Or Claude Cannot See The MCP Server
+
+Check:
+
+- the config file path and JSON syntax
+- whether you configured stdio versus HTTP correctly
+- whether the `cwd` points at the repo root
+- whether `pnpm --filter mcp start:stdio` works manually

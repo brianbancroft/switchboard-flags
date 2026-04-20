@@ -1,0 +1,1114 @@
+{
+  "$schema": "https://stacklit.dev/schema/v1.json",
+  "version": "1",
+  "generated_at": "2026-04-19T03:29:31Z",
+  "stacklit_version": "dev",
+  "merkle_hash": "836590aeef7f57ab07a3ba0d4718d2f7eb68c7a7d0e1a6f5258f2bf8123138a5",
+  "project": {
+    "name": "switchboard-flags",
+    "root": ".",
+    "type": "monorepo",
+    "workspaces": [
+      "apps/api",
+      "apps/dashboard",
+      "apps/docs",
+      "apps/mcp",
+      "apps/web",
+      "packages/api-sdk",
+      "packages/client",
+      "packages/typescript-config",
+      "packages/ui"
+    ]
+  },
+  "tech": {
+    "primary_language": "typescript",
+    "languages": {
+      "javascript": {
+        "files": 5,
+        "lines": 65
+      },
+      "sql": {
+        "files": 15,
+        "lines": 699
+      },
+      "tsx": {
+        "files": 53,
+        "lines": 7629
+      },
+      "typescript": {
+        "files": 103,
+        "lines": 13959
+      }
+    },
+    "frameworks": [
+      "Docker",
+      "Express",
+      "Hono",
+      "Playwright",
+      "React",
+      "Redis"
+    ]
+  },
+  "structure": {
+    "entrypoints": null,
+    "total_files": 176,
+    "total_lines": 22352
+  },
+  "modules": {
+    "apps/api": {
+      "purpose": "API endpoints and handlers",
+      "language": "typescript",
+      "files": 1,
+      "lines": 27,
+      "file_list": [
+        "drizzle.config.ts"
+      ],
+      "depended_by": [
+        "apps/api/src",
+        "apps/api/src/db",
+        "apps/api/src/lib",
+        "apps/api/src/middleware",
+        "apps/api/src/routes"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/drizzle": {
+      "purpose": "Drizzle",
+      "language": "sql",
+      "files": 15,
+      "lines": 699,
+      "file_list": [
+        "0000_redundant_sabretooth.sql",
+        "0001_lowly_weapon_omega.sql",
+        "0002_long_firebird.sql",
+        "0003_new_doorman.sql",
+        "0004_environment_as_app_refactor.sql",
+        "0005_noisy_lilandra.sql",
+        "0006_environments_to_apps_rename.sql",
+        "0007_fat_thunderbolt_ross.sql",
+        "0008_app_environments.sql",
+        "0009_yellow_skrulls.sql",
+        "0010_same_ultron.sql",
+        "0011_bouncy_proudstar.sql",
+        "0012_ambitious_satana.sql",
+        "0014_stiff_wolfsbane.sql",
+        "0015_flags_version.sql"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 4,
+      "lines": 866,
+      "file_list": [
+        "app.ts",
+        "env.ts",
+        "environment-refactor.test.ts",
+        "index.ts"
+      ],
+      "exports": [
+        "createApp()",
+        "env"
+      ],
+      "depends_on": [
+        "apps/api",
+        "apps/api/src/db"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/src/db": {
+      "purpose": "Database access layer",
+      "language": "typescript",
+      "files": 6,
+      "lines": 1391,
+      "file_list": [
+        "client.ts",
+        "drop.ts",
+        "migrate.ts",
+        "migrations.ts",
+        "schema.ts",
+        "seed.ts"
+      ],
+      "exports": [
+        "accounts",
+        "accountsRelations",
+        "apiKeys",
+        "apiKeysRelations",
+        "appConfiguration",
+        "appEnvironments",
+        "appEnvironmentsRelations",
+        "appMemberRoleEnum",
+        "appMembers",
+        "appMembersRelations"
+      ],
+      "type_defs": {
+        "FeatureFlagConfig": "type, defaultValue, rules",
+        "FeatureFlagRule": "attribute, operator, value"
+      },
+      "depends_on": [
+        "apps/api"
+      ],
+      "depended_by": [
+        "apps/api/src",
+        "apps/api/src/lib",
+        "apps/api/src/middleware",
+        "apps/api/src/routes"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/src/lib": {
+      "purpose": "Shared library code",
+      "language": "typescript",
+      "files": 15,
+      "lines": 2042,
+      "file_list": [
+        "api.ts",
+        "app-config.ts",
+        "app-environments.ts",
+        "auth.ts",
+        "contracts.ts",
+        "errors.ts",
+        "evaluate.ts",
+        "flag-versions.ts",
+        "openapi.ts",
+        "permissions.ts",
+        "redis.ts",
+        "redoc.ts",
+        "sdk-auth.ts",
+        "security.ts",
+        "types.ts"
+      ],
+      "exports": [
+        "AppError",
+        "apiKeyCreateInputSchema",
+        "apiKeySchema",
+        "apiKeyScopeSchema",
+        "apiKeyWithSecretSchema",
+        "appAddressSchema",
+        "appCreateInputSchema",
+        "appEnvironmentSchema",
+        "appMemberRoleSchema",
+        "appMemberSchema"
+      ],
+      "type_defs": {
+        "AppAccess": "app, membershipRole, isOwner, isMegaAdmin",
+        "AppBindings": "Variables",
+        "AppEnvironmentSnapshot": "name, address, enabled, position",
+        "AppError": "constructor",
+        "AuthConfig": "passwordEnabled, githubEnabled, googleEnabled, appleEnabled, metaEnabled, oidcEnabled, githubClientId, githubClientSecret, googleClientId, googleClientSecret, appleClientId, appleClientSecret, metaClientId, metaClientSecret, oidcProviders",
+        "CachedPayload": "version, evaluations",
+        "OidcProviderConfig": "slug, name, issuerUrl, clientId, clientSecret",
+        "PublicAuthConfig": "passwordEnabled, githubEnabled, googleEnabled, appleEnabled, metaEnabled, oidcEnabled, oidcProviders"
+      },
+      "depends_on": [
+        "apps/api",
+        "apps/api/src/db"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/src/middleware": {
+      "purpose": "HTTP middleware",
+      "language": "typescript",
+      "files": 3,
+      "lines": 367,
+      "file_list": [
+        "auth.ts",
+        "rate-limit.ts",
+        "request-context.ts"
+      ],
+      "exports": [
+        "createRateLimitMiddleware(options: RateLimitOptions)",
+        "requestContextMiddleware",
+        "requireAppAccess",
+        "requireEnvironmentAccess",
+        "requireSdkAccess(acceptedScopes: ApiKeyScope[])",
+        "requireSdkToken(acceptedScopes: ApiKeyScope[])",
+        "requireUiUser"
+      ],
+      "depends_on": [
+        "apps/api",
+        "apps/api/src/db"
+      ],
+      "activity": "medium"
+    },
+    "apps/api/src/routes": {
+      "purpose": "Routes",
+      "language": "typescript",
+      "files": 16,
+      "lines": 3633,
+      "file_list": [
+        "activity.ts",
+        "api-keys.ts",
+        "auth-config.ts",
+        "auth-providers.ts",
+        "db-health.ts",
+        "dev-overrides.ts",
+        "environment-members.ts",
+        "environments.ts",
+        "evaluate.ts",
+        "flag-env-values.ts",
+        "flags.ts",
+        "health.ts",
+        "overrides.ts",
+        "production-addresses.ts",
+        "sdk.ts",
+        "users.ts"
+      ],
+      "exports": [
+        "registerActivityRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerApiKeyRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerAuthConfigRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerAuthProvidersRoute(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerDatabaseHealthRoute(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerDevOverrideRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerEnvironmentMemberRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerEvaluateRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerFeatureFlagRoutes(app: OpenAPIHono\u003cAppBindings\u003e)",
+        "registerFlagEnvValueRoutes(app: OpenAPIHono\u003cAppBindings\u003e)"
+      ],
+      "depends_on": [
+        "apps/api",
+        "apps/api/src/db"
+      ],
+      "activity": "medium"
+    },
+    "apps/dashboard": {
+      "purpose": "Dashboard",
+      "language": "typescript",
+      "files": 3,
+      "lines": 20,
+      "file_list": [
+        "next-env.d.ts",
+        "next.config.ts",
+        "postcss.config.mjs"
+      ],
+      "activity": "low"
+    },
+    "apps/dashboard/src/app": {
+      "purpose": "App",
+      "language": "tsx",
+      "files": 8,
+      "lines": 1049,
+      "file_list": [
+        "command-center-charts.tsx",
+        "layout.tsx",
+        "page.tsx",
+        "page.tsx",
+        "page.tsx",
+        "page.tsx",
+        "page.tsx",
+        "traffic-charts.tsx"
+      ],
+      "exports": [
+        "CommandCenter()",
+        "CommandCenterCharts({ data }: Props)",
+        "DeploymentsPage()",
+        "IncidentsPage()",
+        "RootLayout({ children, }: Readonly\u003c{ children: React.ReactNode; }\u003e)",
+        "SettingsPage()",
+        "TrafficCharts({ trafficData }: Props)",
+        "TrafficPage()",
+        "metadata"
+      ],
+      "activity": "low"
+    },
+    "apps/dashboard/src/components": {
+      "purpose": "UI components",
+      "language": "tsx",
+      "files": 5,
+      "lines": 363,
+      "file_list": [
+        "badge.tsx",
+        "card.tsx",
+        "charts.tsx",
+        "progress.tsx",
+        "sidebar.tsx"
+      ],
+      "exports": [
+        "Badge",
+        "Card",
+        "CardContent",
+        "CardDescription",
+        "CardHeader",
+        "CardTitle",
+        "LatencyBarChart({ data }: LatencyChartProps)",
+        "MiniSparkline({ data, color = \"var(--chart-1)\", }: MiniSparklineProps)",
+        "Progress",
+        "RegionPieChart({ data }: RegionPieProps)"
+      ],
+      "activity": "low"
+    },
+    "apps/dashboard/src/lib": {
+      "purpose": "Shared library code",
+      "language": "typescript",
+      "files": 2,
+      "lines": 191,
+      "file_list": [
+        "data.ts",
+        "utils.ts"
+      ],
+      "exports": [
+        "cn(...inputs: ClassValue[])",
+        "deployments",
+        "incidents",
+        "regionTraffic",
+        "services",
+        "settingsConfig",
+        "systemMetrics",
+        "trafficData"
+      ],
+      "activity": "low"
+    },
+    "apps/docs": {
+      "purpose": "Docs",
+      "language": "javascript",
+      "files": 1,
+      "lines": 42,
+      "file_list": [
+        "astro.config.mjs"
+      ],
+      "activity": "low"
+    },
+    "apps/docs/.astro": {
+      "purpose": ".astro",
+      "language": "javascript",
+      "files": 4,
+      "lines": 229,
+      "file_list": [
+        "content-assets.mjs",
+        "content-modules.mjs",
+        "content.d.ts",
+        "types.d.ts"
+      ],
+      "depended_by": [
+        "apps/docs/src"
+      ],
+      "activity": "low"
+    },
+    "apps/docs/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 2,
+      "lines": 17,
+      "file_list": [
+        "content.config.ts",
+        "env.d.ts"
+      ],
+      "exports": [
+        "collections"
+      ],
+      "depends_on": [
+        "apps/docs/.astro"
+      ],
+      "activity": "low"
+    },
+    "apps/mcp/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 4,
+      "lines": 274,
+      "file_list": [
+        "env.ts",
+        "http.ts",
+        "index.ts",
+        "server.ts"
+      ],
+      "exports": [
+        "createSwitchboardMcpServer()",
+        "env"
+      ],
+      "depends_on": [
+        "apps/mcp/src/prompts"
+      ],
+      "depended_by": [
+        "apps/mcp/src/lib",
+        "apps/mcp/src/resources",
+        "apps/mcp/src/tools"
+      ],
+      "activity": "low"
+    },
+    "apps/mcp/src/lib": {
+      "purpose": "Shared library code",
+      "language": "typescript",
+      "files": 6,
+      "lines": 967,
+      "file_list": [
+        "backend.ts",
+        "context.ts",
+        "evaluate.ts",
+        "register.ts",
+        "results.ts",
+        "schemas.ts"
+      ],
+      "exports": [
+        "EnvironmentMember",
+        "FeatureFlag",
+        "FlagOverride",
+        "ProductionAddress",
+        "SwitchboardBackend",
+        "SwitchboardMcpError",
+        "apiKeyScopeSchema",
+        "appAddressSchema",
+        "appRefSchema",
+        "appRoleSchema"
+      ],
+      "type_defs": {
+        "McpUserContext": "auth, user",
+        "SwitchboardBackend": "getSession, getHealth, getDatabaseHealth, listApps, listEnvironments, resolveApp, resolveEnvironment, createApp, createEnvironment, updateApp, updateEnvironment, deleteApp, deleteEnvironment, listProductionAddresses, resolveProductionAddress, createProductionAddress, updateProductionAddress, deleteProductionAddress, listMembers, resolveMember, createMember, updateMember, deleteMember, listFlags, resolveFlag, createFlag, updateFlag, deleteFlag, listOverrides, findOverride, createOverride, updateOverride, deleteOverride, listApiKeys, resolveApiKey, createApiKey, deleteApiKey, resolveEvaluateAuth, evaluateApp, evaluateEnvironment",
+        "SwitchboardMcpError": "constructor"
+      },
+      "depends_on": [
+        "apps/mcp/src"
+      ],
+      "activity": "low"
+    },
+    "apps/mcp/src/prompts": {
+      "purpose": "Prompts",
+      "language": "typescript",
+      "files": 1,
+      "lines": 80,
+      "file_list": [
+        "index.ts"
+      ],
+      "exports": [
+        "registerPrompts(server: McpServer)"
+      ],
+      "depended_by": [
+        "apps/mcp/src"
+      ],
+      "activity": "low"
+    },
+    "apps/mcp/src/resources": {
+      "purpose": "Resources",
+      "language": "typescript",
+      "files": 1,
+      "lines": 56,
+      "file_list": [
+        "index.ts"
+      ],
+      "exports": [
+        "registerResources(server: McpServer, backend: SwitchboardBackend)"
+      ],
+      "depends_on": [
+        "apps/mcp/src"
+      ],
+      "activity": "low"
+    },
+    "apps/mcp/src/tools": {
+      "purpose": "Tools",
+      "language": "typescript",
+      "files": 9,
+      "lines": 963,
+      "file_list": [
+        "api-keys.ts",
+        "environment-members.ts",
+        "environments.ts",
+        "evaluate.ts",
+        "flags.ts",
+        "index.ts",
+        "overrides.ts",
+        "production-addresses.ts",
+        "system.ts"
+      ],
+      "exports": [
+        "registerApiKeyTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerEnvironmentMemberTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerEnvironmentTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerEvaluateTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerFlagTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerOverrideTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerProductionAddressTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerSystemTools(server: McpServer, backend: SwitchboardBackend)",
+        "registerTools(server: McpServer, backend: SwitchboardBackend)"
+      ],
+      "depends_on": [
+        "apps/mcp/src"
+      ],
+      "activity": "low"
+    },
+    "apps/web": {
+      "purpose": "Web",
+      "language": "typescript",
+      "files": 4,
+      "lines": 36,
+      "file_list": [
+        "postcss.config.mjs",
+        "react-router.config.ts",
+        "vite-env.d.ts",
+        "vite.config.ts"
+      ],
+      "activity": "medium"
+    },
+    "apps/web/.react-router/types": {
+      "purpose": "Types",
+      "language": "typescript",
+      "files": 16,
+      "lines": 1116,
+      "file_list": [
+        "+future.ts",
+        "+routes.ts",
+        "+server-build.d.ts",
+        "_index.ts",
+        "dashboard._index.ts",
+        "dashboard.apps.$appId._index.ts",
+        "dashboard.apps.$appId.activity.ts",
+        "dashboard.apps.$appId.flags.$flagId.ts",
+        "dashboard.apps.$appId.settings.ts",
+        "dashboard.apps._index.ts",
+        "dashboard.apps.new.ts",
+        "dashboard.apps.ts",
+        "dashboard.ts",
+        "dashboard.users.ts",
+        "login.ts",
+        "root.ts"
+      ],
+      "exports": [
+        "allowedActionOrigins",
+        "assets",
+        "assetsBuildDirectory",
+        "basename",
+        "entry",
+        "future",
+        "isSpaMode",
+        "prerender",
+        "publicPath",
+        "routeDiscovery"
+      ],
+      "activity": "low"
+    },
+    "apps/web/app": {
+      "purpose": "App",
+      "language": "tsx",
+      "files": 2,
+      "lines": 75,
+      "file_list": [
+        "root.tsx",
+        "routes.ts"
+      ],
+      "exports": [
+        "App()",
+        "ErrorBoundary({ error }: Route.ErrorBoundaryProps)",
+        "Layout({ children }: { children: ReactNode })",
+        "links",
+        "meta"
+      ],
+      "depended_by": [
+        "apps/web/app/routes"
+      ],
+      "activity": "medium"
+    },
+    "apps/web/app/routes": {
+      "purpose": "Routes",
+      "language": "tsx",
+      "files": 12,
+      "lines": 3034,
+      "file_list": [
+        "_index.tsx",
+        "dashboard._index.tsx",
+        "dashboard.apps.$appId._index.tsx",
+        "dashboard.apps.$appId.activity.tsx",
+        "dashboard.apps.$appId.flags.$flagId.tsx",
+        "dashboard.apps.$appId.settings.tsx",
+        "dashboard.apps._index.tsx",
+        "dashboard.apps.new.tsx",
+        "dashboard.apps.tsx",
+        "dashboard.tsx",
+        "dashboard.users.tsx",
+        "login.tsx"
+      ],
+      "exports": [
+        "AppActivityPage()",
+        "AppFlagsRoute()",
+        "AppSettingsRoute()",
+        "AppsIndexRoute()",
+        "AppsLayout()",
+        "DashboardIndexRoute()",
+        "DashboardLayout()",
+        "FlagViewRoute()",
+        "HomeRoute()",
+        "LoginRoute()"
+      ],
+      "depends_on": [
+        "apps/web/app"
+      ],
+      "activity": "low"
+    },
+    "apps/web/components": {
+      "purpose": "UI components",
+      "language": "tsx",
+      "files": 6,
+      "lines": 731,
+      "file_list": [
+        "app-sidebar.tsx",
+        "login-form.tsx",
+        "nav-main.tsx",
+        "nav-projects.tsx",
+        "nav-user.tsx",
+        "team-switcher.tsx"
+      ],
+      "exports": [
+        "AppSidebar({ user, onSignOut, ...props }: React.ComponentProps\u003ctypeof Sidebar...",
+        "LoginForm({ className, ...props }: React.ComponentProps\u003c\"div\"\u003e)",
+        "NavMain({ items, }: { items: { title: string; url: string; icon?: React.React...",
+        "NavProjects({ projects, }: { projects: { name: string; url: string; icon: Rea...",
+        "NavUser({ user, onSignOut, }: { user: { name: string; email: string; avatar: ...",
+        "TeamSwitcher({ teams, }: { teams: { name: string; logo: React.ReactNode; plan..."
+      ],
+      "activity": "medium"
+    },
+    "apps/web/components/ui": {
+      "purpose": "Ui",
+      "language": "tsx",
+      "files": 18,
+      "lines": 2324,
+      "file_list": [
+        "avatar.tsx",
+        "badge.tsx",
+        "breadcrumb.tsx",
+        "button.tsx",
+        "card.tsx",
+        "collapsible.tsx",
+        "dropdown-menu.tsx",
+        "field.tsx",
+        "input.tsx",
+        "label.tsx",
+        "select.tsx",
+        "separator.tsx",
+        "sheet.tsx",
+        "sidebar.tsx",
+        "skeleton.tsx",
+        "switch.tsx",
+        "table.tsx",
+        "tooltip.tsx"
+      ],
+      "exports": [
+        "Avatar",
+        "AvatarBadge",
+        "AvatarFallback",
+        "AvatarGroup",
+        "AvatarGroupCount",
+        "AvatarImage",
+        "Badge",
+        "Breadcrumb",
+        "BreadcrumbEllipsis",
+        "BreadcrumbItem"
+      ],
+      "activity": "low"
+    },
+    "apps/web/hooks": {
+      "purpose": "React hooks",
+      "language": "typescript",
+      "files": 1,
+      "lines": 19,
+      "file_list": [
+        "use-mobile.ts"
+      ],
+      "exports": [
+        "useIsMobile()"
+      ],
+      "activity": "low"
+    },
+    "apps/web/lib": {
+      "purpose": "Shared library code",
+      "language": "typescript",
+      "files": 4,
+      "lines": 496,
+      "file_list": [
+        "api.server.ts",
+        "api.ts",
+        "auth-client.ts",
+        "utils.ts"
+      ],
+      "exports": [
+        "API_URL",
+        "addAppMember(appId: string, data: { userId: string; role: \"admin\" | \"manager\"...",
+        "apiFetch(path: string, request: Request, options?: RequestInit) Promise\u003cT\u003e",
+        "authClient",
+        "cn(...inputs: ClassValue[])",
+        "createApiKey(appId: string, data: { environmentId: string; description?: stri...",
+        "createApp(data: { name: string; description?: string | null; stagingAddress?:...",
+        "createFlag(appId: string, data: { name: string; description?: string | null; ...",
+        "createOverride(appId: string, data: { flagId: string; userId: string; value: ...",
+        "deleteApiKey(appId: string, apiKeyId: string) Promise\u003cvoid\u003e"
+      ],
+      "type_defs": {
+        "ApiKey": "id, appId, environmentId, description, scopes, expiresAt, lastUsedAt, createdAt, updatedAt",
+        "App": "id, name, description, ownerId, stagingAddress, nightlyAddress, environments, productionAddresses, membershipRole, isOwner, createdAt, updatedAt",
+        "AppMember": "id, appId, userId, role, user, createdAt, updatedAt",
+        "DevOverride": "id, userId, appId, environments, createdAt, updatedAt",
+        "FeatureFlag": "id, appId, name, description, config, createdAt, updatedAt",
+        "FlagAuditLogEntry": "id, actionType, flagId, flagName, appId, environmentId, changedByUserId, changedByUser, oldValue, newValue, changedAt",
+        "FlagEnvValue": "id, flagId, appId, environmentId, value, changedByUserId, changedByUser, createdAt, updatedAt",
+        "FlagEnvValueUser": "id, name, email",
+        "FlagOverride": "id, appId, flagId, userId, value, createdAt, updatedAt",
+        "User": "id, email, name, username, image, isMegaAdmin, createdAt, updatedAt"
+      },
+      "activity": "low"
+    },
+    "packages/api-sdk/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 1,
+      "lines": 913,
+      "file_list": [
+        "index.ts"
+      ],
+      "exports": [
+        "SwitchboardApiClientError",
+        "SwitchboardClient",
+        "createClient(baseUrl: string, options?: SwitchboardClientOptions)",
+        "evaluateExample",
+        "type ApiKey",
+        "type ApiKeyCreateInput",
+        "type ApiKeyScope",
+        "type App",
+        "type AppCreateInput",
+        "type AppEnvironment"
+      ],
+      "type_defs": {
+        "AppUpdateInput": "name, description, stagingAddress, nightlyAddress",
+        "EvaluateResponse": "appId, evaluatedAt, addressMatched, evaluations",
+        "FeatureFlag": "id, appId, name, description, config, createdAt, updatedAt",
+        "FeatureFlagConfig": "type, defaultValue, rules",
+        "FlagOverrideCreateInput": "flagId, userId, value",
+        "ProductionAddressUpdateInput": "label, address",
+        "SwitchboardApiError": "success, error, meta",
+        "SwitchboardApiSuccess": "success, data, meta",
+        "SwitchboardClient": "constructor, getSession, getHealth, getDatabaseHealth, listApps, listEnvironments, createApp, createEnvironment, getApp, getEnvironment, updateApp, updateEnvironment, deleteApp, deleteEnvironment, listProductionAddresses, createProductionAddress, getProductionAddress, updateProductionAddress, deleteProductionAddress, listMembers, createMember, updateMember, deleteMember, listFlags, createFlag, getFlag, updateFlag, deleteFlag, listOverrides, createOverride, updateOverride, deleteOverride, listApiKeys, createApiKey, getApiKey, deleteApiKey, evaluateApp, evaluateEnvironment",
+        "SwitchboardHealthPayload": "status, service, environment, timestamp"
+      },
+      "activity": "medium"
+    },
+    "packages/client/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 1,
+      "lines": 172,
+      "file_list": [
+        "index.ts"
+      ],
+      "exports": [
+        "Switchboard",
+        "SwitchboardError",
+        "type JsonValue",
+        "type SwitchboardOptions"
+      ],
+      "type_defs": {
+        "Switchboard": "constructor, ready, check",
+        "SwitchboardError": "constructor",
+        "SwitchboardOptions": "url, token, minCheckIntervalMs, onError, callerUrl, fetch"
+      },
+      "activity": "low"
+    },
+    "packages/ui/src": {
+      "purpose": "Src",
+      "language": "tsx",
+      "files": 3,
+      "lines": 59,
+      "file_list": [
+        "button.tsx",
+        "card.tsx",
+        "code.tsx"
+      ],
+      "exports": [
+        "Button",
+        "Card({ className, title, children, href, }: { className?: string; title: stri...",
+        "Code({ children, className, }: { children: React.ReactNode; className?: strin..."
+      ],
+      "activity": "low"
+    },
+    "root": {
+      "purpose": "Root package",
+      "language": "typescript",
+      "files": 1,
+      "lines": 30,
+      "file_list": [
+        "playwright.config.ts"
+      ],
+      "activity": "low"
+    }
+  },
+  "dependencies": {
+    "edges": [
+      [
+        "apps/api/src",
+        "apps/api"
+      ],
+      [
+        "apps/api/src",
+        "apps/api/src/db"
+      ],
+      [
+        "apps/api/src/db",
+        "apps/api"
+      ],
+      [
+        "apps/api/src/lib",
+        "apps/api"
+      ],
+      [
+        "apps/api/src/lib",
+        "apps/api/src/db"
+      ],
+      [
+        "apps/api/src/middleware",
+        "apps/api"
+      ],
+      [
+        "apps/api/src/middleware",
+        "apps/api/src/db"
+      ],
+      [
+        "apps/api/src/routes",
+        "apps/api"
+      ],
+      [
+        "apps/api/src/routes",
+        "apps/api/src/db"
+      ],
+      [
+        "apps/docs/src",
+        "apps/docs/.astro"
+      ],
+      [
+        "apps/mcp/src",
+        "apps/mcp/src/prompts"
+      ],
+      [
+        "apps/mcp/src/lib",
+        "apps/mcp/src"
+      ],
+      [
+        "apps/mcp/src/resources",
+        "apps/mcp/src"
+      ],
+      [
+        "apps/mcp/src/tools",
+        "apps/mcp/src"
+      ],
+      [
+        "apps/web/app/routes",
+        "apps/web/app"
+      ]
+    ],
+    "entrypoints": null,
+    "most_depended": [
+      "apps/api",
+      "apps/api/src/db",
+      "apps/mcp/src",
+      "apps/docs/.astro",
+      "apps/mcp/src/prompts",
+      "apps/web/app",
+      "apps/api/drizzle",
+      "apps/api/src",
+      "apps/api/src/lib",
+      "apps/api/src/middleware"
+    ],
+    "isolated": [
+      "apps/api/drizzle",
+      "apps/dashboard",
+      "apps/dashboard/src/app",
+      "apps/dashboard/src/components",
+      "apps/dashboard/src/lib",
+      "apps/docs",
+      "apps/web",
+      "apps/web/.react-router/types",
+      "apps/web/components",
+      "apps/web/components/ui",
+      "apps/web/hooks",
+      "apps/web/lib",
+      "packages/api-sdk/src",
+      "packages/client/src",
+      "packages/ui/src",
+      "root"
+    ]
+  },
+  "git": {
+    "hot_files": [
+      {
+        "path": "pnpm-lock.yaml",
+        "commits_90d": 10
+      },
+      {
+        "path": "apps/api/drizzle/meta/_journal.json",
+        "commits_90d": 9
+      },
+      {
+        "path": "apps/api/src/db/schema.ts",
+        "commits_90d": 9
+      },
+      {
+        "path": "apps/api/src/app.ts",
+        "commits_90d": 8
+      },
+      {
+        "path": "apps/api/src/lib/contracts.ts",
+        "commits_90d": 7
+      },
+      {
+        "path": "apps/api/src/middleware/auth.ts",
+        "commits_90d": 7
+      },
+      {
+        "path": "apps/web/package.json",
+        "commits_90d": 7
+      },
+      {
+        "path": "package.json",
+        "commits_90d": 7
+      },
+      {
+        "path": "packages/api-sdk/src/index.ts",
+        "commits_90d": 7
+      },
+      {
+        "path": "apps/api/src/db/seed.ts",
+        "commits_90d": 6
+      },
+      {
+        "path": "apps/api/src/routes/api-keys.ts",
+        "commits_90d": 6
+      },
+      {
+        "path": "apps/api/src/routes/environments.ts",
+        "commits_90d": 6
+      },
+      {
+        "path": "apps/api/src/routes/evaluate.ts",
+        "commits_90d": 6
+      },
+      {
+        "path": "apps/api/src/lib/permissions.ts",
+        "commits_90d": 5
+      },
+      {
+        "path": "apps/api/src/routes/flags.ts",
+        "commits_90d": 5
+      },
+      {
+        "path": "apps/api/src/routes/overrides.ts",
+        "commits_90d": 5
+      },
+      {
+        "path": "apps/web/app/globals.css",
+        "commits_90d": 5
+      },
+      {
+        "path": "apps/web/components/login-form.tsx",
+        "commits_90d": 5
+      },
+      {
+        "path": "apps/api/package.json",
+        "commits_90d": 4
+      },
+      {
+        "path": "apps/api/src/lib/auth.ts",
+        "commits_90d": 4
+      }
+    ],
+    "recent": [
+      ".claude/launch.json",
+      ".claude/worktrees/affectionate-sinoussi",
+      ".claude/worktrees/epic-blackwell",
+      "Makefile",
+      "apps/api/drizzle/0009_drop_saturation_percent.sql",
+      "apps/api/drizzle/0014_stiff_wolfsbane.sql",
+      "apps/api/drizzle/meta/0010_snapshot.json",
+      "apps/api/drizzle/meta/0011_snapshot.json",
+      "apps/api/drizzle/meta/0012_snapshot.json",
+      "apps/api/drizzle/meta/0014_snapshot.json"
+    ],
+    "stable": [
+      ".claude/plans/gentle-scribbling-rabbit.md",
+      ".npmrc",
+      "apps/api/Dockerfile",
+      "apps/api/README.md",
+      "apps/api/drizzle/0001_lowly_weapon_omega.sql",
+      "apps/api/drizzle/0002_long_firebird.sql",
+      "apps/api/drizzle/0003_new_doorman.sql",
+      "apps/api/drizzle/0004_environment_as_app_refactor.sql",
+      "apps/api/drizzle/0005_noisy_lilandra.sql",
+      "apps/api/drizzle/0006_environments_to_apps_rename.sql"
+    ]
+  },
+  "hints": {
+    "add_feature": "Add handler in apps/api/src/db",
+    "test_command": "npm test",
+    "env_vars": [
+      "\"3000",
+      "\"4000",
+      "\"5432",
+      "\"6379",
+      "API_HOST",
+      "API_PORT",
+      "API_URL",
+      "AUTH_APPLE_CLIENT_ID",
+      "AUTH_APPLE_CLIENT_SECRET",
+      "AUTH_APPLE_ENABLED",
+      "AUTH_GITHUB_CLIENT_ID",
+      "AUTH_GITHUB_CLIENT_SECRET",
+      "AUTH_GITHUB_ENABLED",
+      "AUTH_GOOGLE_CLIENT_ID",
+      "AUTH_GOOGLE_CLIENT_SECRET",
+      "AUTH_GOOGLE_ENABLED",
+      "AUTH_META_CLIENT_ID",
+      "AUTH_META_CLIENT_SECRET",
+      "AUTH_META_ENABLED",
+      "AUTH_OIDC_ENABLED",
+      "AUTH_PASSWORD_ENABLED",
+      "BETTER_AUTH_SECRET",
+      "BETTER_AUTH_TRUSTED_ORIGINS",
+      "BETTER_AUTH_URL",
+      "CORS_ORIGINS",
+      "DATABASE_URL",
+      "E2E_EMAIL",
+      "E2E_PASSWORD",
+      "HOSTNAME",
+      "MCP_ALLOWED_HOSTS",
+      "MCP_AUTH_TOKEN",
+      "MCP_HTTP_HOST",
+      "MCP_HTTP_PATH",
+      "MCP_HTTP_PORT",
+      "NEXT_PUBLIC_API_URL",
+      "NODE_ENV",
+      "PLAYWRIGHT_API_URL",
+      "PLAYWRIGHT_BASE_URL",
+      "PORT",
+      "POSTGRES_DB",
+      "POSTGRES_HOST_AUTH_METHOD",
+      "POSTGRES_USER",
+      "PUBLIC_API_SPEC_URL",
+      "REDIS_URL",
+      "SWITCHBOARD_API_BASE_URL",
+      "SWITCHBOARD_API_DEFAULT_HEADERS_JSON",
+      "SWITCHBOARD_API_KEY",
+      "SWITCHBOARD_API_UI_USER_ID",
+      "SWITCHBOARD_DEV_BASIC_AUTH_PASSWORD",
+      "SWITCHBOARD_DEV_BASIC_AUTH_USERNAME",
+      "SWITCHBOARD_EVALUATE_API_KEYS_JSON",
+      "api",
+      "args",
+      "build",
+      "condition",
+      "container_name",
+      "context",
+      "depends_on",
+      "dockerfile",
+      "healthcheck",
+      "image",
+      "interval",
+      "ports",
+      "postgres",
+      "redis",
+      "retries",
+      "switchboard-postgres-data",
+      "switchboard-redis-data",
+      "test",
+      "timeout",
+      "volumes",
+      "web"
+    ]
+  },
+  "architecture": {}
+}

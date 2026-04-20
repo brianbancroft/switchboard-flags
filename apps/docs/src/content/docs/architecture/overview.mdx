@@ -1,0 +1,54 @@
+---
+title: Architecture Overview
+description: How the API, database, UI, SDK, and MCP server fit together.
+---
+
+## System Topology
+
+```mermaid
+flowchart LR
+  UI["UI Apps\napps/ui, apps/web"] --> API["Switchboard API\napps/api"]
+  SDK["API SDK\npackages/api-sdk"] --> API
+  MCP["Switchboard MCP Server\napps/mcp"] --> API
+  API --> DB["PostgreSQL\nDrizzle schema + migrations"]
+  Docs["Docs Site\napps/docs"] --> APIREF["OpenAPI Snapshot\napps/docs/public/openapi.yaml"]
+```
+
+## Core Components
+
+- `apps/api` is the only database-facing service. It owns validation, permissions, and all writes.
+- `apps/mcp` is a dedicated MCP server that never talks to PostgreSQL directly. It composes the REST API through `packages/api-sdk`.
+- `packages/api-sdk` exposes a typed client for environments, clients, flags, overrides, API keys, and evaluation.
+- `apps/docs` is a Starlight-based static docs site that can be hosted on GitHub Pages or any static host.
+
+## Request Flow
+
+```mermaid
+sequenceDiagram
+  participant Assistant
+  participant MCP as MCP Server
+  participant API as Hono API
+  participant DB as PostgreSQL
+
+  Assistant->>MCP: create_flag / evaluate_flags
+  MCP->>API: HTTPS request using UI auth or SDK auth
+  API->>DB: Drizzle query
+  DB-->>API: rows
+  API-->>MCP: JSON response
+  MCP-->>Assistant: structured tool result
+```
+
+## Why The API Boundary Matters
+
+- It centralizes authorization and validation.
+- It keeps the MCP server safe and stateless.
+- It lets UI apps evolve without embedding persistence logic.
+- It aligns with the repo rule from [API Boundary](/architecture/api-boundary/).
+
+## Repository Layout
+
+- `apps/api`: Hono routes, auth middleware, Drizzle schema, migrations
+- `apps/mcp`: MCP server, HTTP and stdio transports, resources, prompts, tools
+- `apps/docs`: Starlight documentation site
+- `packages/api-sdk`: typed REST client for Switchboard consumers
+- `packages/ui`: shared UI primitives

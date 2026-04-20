@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "switchboard": {
+      "command": "pnpm",
+      "args": ["--filter", "mcp", "start:stdio"],
+      "cwd": "/Users/brianbancroft/programming/side-hustle/switchboard",
+      "env": {
+        "SWITCHBOARD_API_BASE_URL": "http://127.0.0.1:4000",
+        "SWITCHBOARD_API_UI_USER_ID": "PUT-REAL-USER-UUID-HERE"
+      }
+    }
+  }
+}

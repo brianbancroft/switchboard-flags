@@ -1,0 +1,18 @@
+---
+title: API Boundary
+description: Database access rules for Switchboard.
+---
+
+## Rule
+
+The only code that should directly touch the database is `apps/api`.
+
+## Implications
+
+- Frontend apps should fetch or mutate data through API endpoints
+- Shared packages can model contracts, types, and client helpers
+- Database-specific logic should stay behind the API boundary
+
+## Why this matters
+
+Keeping persistence logic inside the API gives us one place to manage access control, validation, and schema changes.

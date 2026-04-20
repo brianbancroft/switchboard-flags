@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "switchboard": {
+      "url": "http://127.0.0.1:4010/mcp",
+      "headers": {
+        "Authorization": "Bearer REPLACE_WITH_MCP_AUTH_TOKEN"
+      }
+    }
+  }
+}

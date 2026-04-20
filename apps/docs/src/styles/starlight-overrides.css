@@ -1,0 +1,96 @@
+:root {
+  --switchboard-paper: #f7f2ea;
+  --switchboard-ink: #4f473f;
+  --switchboard-wash: #ebe4db;
+  --switchboard-shadow: rgba(88, 71, 56, 0.16);
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent: hsl(30 68% 43%);
+  --sl-color-accent-high: hsl(28 39% 24%);
+  --sl-color-accent-low: hsl(32 52% 91%);
+}
+
+:root[data-has-hero] .hero {
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-block: clamp(2rem, 4vw, 4rem) 1.5rem;
+}
+
+:root[data-has-hero] .hero > .hero-html {
+  width: min(100%, 42rem);
+}
+
+:root[data-has-hero] .hero .switchboard-home-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.38;
+  overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid rgba(79, 71, 63, 0.12);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 48%),
+    linear-gradient(180deg, var(--switchboard-paper), var(--switchboard-wash));
+  box-shadow: 0 28px 70px var(--switchboard-shadow);
+}
+
+:root[data-has-hero] .hero .switchboard-home-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255, 255, 255, 0.85),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 82% 28%,
+      rgba(255, 255, 255, 0.55),
+      transparent 18%
+    );
+  pointer-events: none;
+}
+
+:root[data-has-hero] .hero .switchboard-home-art img {
+  position: absolute;
+  inset: 0;
+  width: 122%;
+  max-width: none;
+  height: 122%;
+  object-fit: cover;
+  object-position: center 42%;
+  transform: translate(-8.5%, -3.5%);
+}
+
+:root[data-has-hero] .hero .stack {
+  gap: 1.5rem;
+}
+
+:root[data-has-hero] .hero .copy > * {
+  max-width: 34rem;
+}
+
+:root[data-has-hero] .hero .tagline {
+  max-width: 32rem;
+}
+
+@media (min-width: 50rem) {
+  :root[data-has-hero] .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 40rem);
+    align-items: center;
+  }
+
+  :root[data-has-hero] .hero > .hero-html {
+    width: min(100%, 40rem);
+  }
+}
+
+@media (max-width: 49.99rem) {
+  :root[data-has-hero] .hero > .hero-html {
+    width: min(100%, 34rem);
+  }
+
+  :root[data-has-hero] .hero .switchboard-home-art {
+    aspect-ratio: 1.26;
+  }
+}

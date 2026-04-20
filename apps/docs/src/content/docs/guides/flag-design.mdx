@@ -1,0 +1,67 @@
+---
+title: Feature Flag Best Practices
+description: Naming, targeting, overrides, cleanup, and production rollout strategy.
+---
+
+## Naming
+
+Use `lowercase_snake_case` and favor intent over implementation details.
+
+Good:
+
+- `dark_mode`
+- `new_navigation`
+- `onboarding_revamp`
+
+Avoid:
+
+- `feature123`
+- `ticket_1427_fix`
+- `temp_flag`
+
+## Defaults
+
+- Start from the safest default.
+- For boolean flags, default to `false` unless you are explicitly default-on.
+- For non-boolean flags, choose a stable fallback that works even if no rules match.
+
+## Targeting
+
+Switchboard rules are boolean gates over request attributes.
+
+Recommended rollout order:
+
+1. create the flag with a safe default
+2. target a non-production environment
+3. target a narrow client or attribute segment
+4. expand gradually
+5. delete the flag after rollout is complete and permanent
+
+## Overrides
+
+Use overrides for:
+
+- support debugging
+- temporary customer fixes
+- validation during rollout
+
+Do not use overrides as a long-term segmentation system. They become hard to reason about at scale.
+
+## Multi-Client Production Environments
+
+When one environment serves multiple clients:
+
+- register each client explicitly
+- keep URL regexes narrow and testable
+- include `clientLabel` or `url` in evaluation requests
+- avoid sharing one broad catch-all client when behavior differs materially
+
+## Cleanup
+
+A flag should have:
+
+- an owner
+- a review date
+- a cleanup plan
+
+Rollout flags that stay forever become permanent product configuration and should eventually be absorbed into the default code path.

@@ -1,0 +1,1 @@
+CREATE INDEX "flag_overrides_environment_flag_idx" ON "flag_overrides" USING btree ("environment_id","flag_id");

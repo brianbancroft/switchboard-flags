@@ -1,0 +1,69 @@
+---
+title: API Reference
+description: How to use the OpenAPI 3.1 specification and live reference view.
+---
+
+## OpenAPI Source Of Truth
+
+Switchboard ships a checked-in OpenAPI 3.1 snapshot at:
+
+- [apps/docs/public/openapi.yaml](/Users/brianbancroft/programming/side-hustle/switchboard/apps/docs/public/openapi.yaml)
+
+This snapshot exists so static docs hosting remains reliable even when the runtime OpenAPI generator changes.
+
+## Why The Snapshot Exists
+
+The Hono app already defines routes with `@hono/zod-openapi`, but the current live generator is tripping over the recursive JSON-value schema used for arbitrary flag payloads. The checked-in snapshot keeps:
+
+- GitHub Pages builds stable
+- code generation deterministic
+- external references usable by AI agents and SDK generators
+
+## Use The Spec
+
+Common uses:
+
+- generate SDK clients
+- feed API descriptions into AI agents
+- import into Postman or Insomnia
+- diff API changes in pull requests
+
+### Download
+
+```bash
+curl -O http://localhost:3001/openapi.yaml
+```
+
+### Validate
+
+```bash
+npx @redocly/cli lint apps/docs/public/openapi.yaml
+```
+
+### Generate A Client
+
+```bash
+npx openapi-typescript apps/docs/public/openapi.yaml -o ./switchboard-api.d.ts
+```
+
+## Interactive View
+
+The docs app exposes Redoc at:
+
+- `/api`
+
+It renders from the checked-in spec by default and can be pointed at another URL through `PUBLIC_API_SPEC_URL`.
+
+## Coverage
+
+The spec covers:
+
+- environments
+- clients
+- feature flags
+- overrides
+- API keys
+- evaluation
+- health and database health
+
+For full endpoint details, open `/api` in the docs site.

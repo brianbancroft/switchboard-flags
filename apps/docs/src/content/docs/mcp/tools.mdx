@@ -1,0 +1,85 @@
+---
+title: MCP Tools
+description: Tool catalog, write-safety behavior, and example prompts.
+---
+
+## Write Safety Model
+
+All mutating tools require:
+
+```json
+{
+  "approval": {
+    "confirmed": true,
+    "reason": "User explicitly approved this write in the current conversation."
+  }
+}
+```
+
+This is enforced in the MCP input schema and is part of the platform’s safety story.
+
+## System Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `get_switchboard_health` | Check whether the Hono API is alive | `Check whether Switchboard is up.` |
+| `get_switchboard_database_health` | Check DB connectivity through the API boundary | `Is the Switchboard database reachable?` |
+
+## Environment Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `list_environments` | List environments visible to the configured user context | `List my Switchboard environments.` |
+| `get_environment` | Get one environment by ID or exact name | `Show me the production environment details.` |
+| `create_environment` | Create a new environment | `Create a nightly environment for QA.` |
+| `update_environment` | Update environment metadata | `Rename nightly-eu to staging-eu.` |
+| `delete_environment` | Delete an environment | `Delete the old demo environment after I confirm.` |
+
+## Client Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `list_clients` | List registered clients in an environment | `What clients are registered in production?` |
+| `create_client` | Create an environment client with a label and URL regex | `Add a web-app client for https://app.example.com/.* in production.` |
+| `update_client` | Update label or URL pattern | `Change the mobile-app URL pattern in staging.` |
+| `delete_client` | Remove an environment client | `Delete the legacy-portal client once I approve it.` |
+
+## Feature Flag Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `list_flags` | List flags in an environment | `Show me all flags in staging.` |
+| `get_flag` | Get one flag by ID or name | `Open the dark_mode flag in production.` |
+| `create_flag` | Create a new feature flag | `Create a new feature flag for dark mode in production.` |
+| `update_flag` | Update a flag | `Change the default value for onboarding_revamp to false in staging.` |
+| `delete_flag` | Delete a flag | `Remove the unused beta_banner flag after I confirm.` |
+
+## Override Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `list_flag_overrides` | List overrides filtered by environment, flag, or user | `Show overrides for dark_mode in production.` |
+| `set_flag_override` | Create or update a per-user override | `Turn dark_mode on for user 123 in production.` |
+| `delete_flag_override` | Remove an override by ID or flag+user pair | `Delete the temporary override for user 123 on dark_mode.` |
+
+## API Key Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `list_api_keys` | List environment API keys | `Show me the SDK keys in production.` |
+| `create_api_key` | Create a new environment API key | `Create a read-only SDK key for staging.` |
+| `delete_api_key` | Delete an API key | `Delete the expired staging SDK key.` |
+
+## Evaluation Tools
+
+| Tool | Description | Example prompt |
+| --- | --- | --- |
+| `evaluate_flags` | Call the real evaluate endpoint | `Evaluate dark_mode and new_nav for a pro user in production.` |
+| `get_flag_value` | Get the effective value of one flag | `What is dark_mode for user 123 on the web app in production?` |
+
+## Prompting Tips For Assistants
+
+- Mention the environment by exact name whenever possible.
+- Use real UUIDs for user-specific overrides.
+- Specify whether you want a read-only inspection or an actual write.
+- Include client context such as `clientLabel` or `url` when debugging evaluation.
