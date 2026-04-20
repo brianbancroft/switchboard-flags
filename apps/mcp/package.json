@@ -7,6 +7,9 @@
     "dist",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx watch src/http.ts",
     "dev:stdio": "tsx watch src/index.ts",
